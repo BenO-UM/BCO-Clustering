@@ -25,7 +25,7 @@ Nre = 4;
 % Number of recruited bees following non-elite bees
 Nrn = 2;
 
-% Number of iterations (we can use this or some other stopping criterion
+% Number of iterations (we can use this or some other stopping criterion)
 numIterations = 100;
 
 % Number of examples to reassign for local search
@@ -44,13 +44,24 @@ for iterIdx = 1:numIterations
     eliteBeeIdxs = sortedIdxs(1:Ne);
     % Select other bees for local search
     otherIdxs = sortedIdxs(Ne+1:end);
-    otherSearchIdxs = otherIdxs(randomIntInRange(1,length(otherIdxs),Nb-Ne,1));
+    nonEliteBeeIdxs = otherIdxs(randperm(length(otherIdxs),Nb-Ne));
     % Update elite bee cluster numbers
     for eliteBeeIdx = eliteBeeIdxs
         scoutingBees(eliteBeeIdx) = updateClusterNumbers(...
-            scoutingBees(:,eliteBeeIdx),Nre,numExamplesToReassign,X,k);
+            scoutingBees(:,eliteBeeIdx),scoutingBeeScores(eliteBeeIdx),...
+            Nre,numExamplesToReassign,X,k);
     end
-    
+    % Update other bee cluster numbers
+    for nonEliteBeeIdx = nonEliteBeeIdxs
+        scoutingBees(eliteBeeIdx) = updateClusterNumbers(...
+            scoutingBees(:,nonEliteBeeIdx),scoutingBeeScores(nonEliteBeeIdx),...
+            Nrn,numExamplesToReassign,X,k);
+    end
+    % Set remaining bees randomly
+    remainingBeeIdxs = otherIdxs(~ismember(otherIdxs,nonEliteBeeIdxs));
+    scoutingBees(:,remainingBeeIdxs) = randomIntInRange(1,k,numExamples,length(remainingBeeIdxs));
+    % Update scores
+    scoutingBeeScores = evaluateBees(X,scoutingBees);
 end
 
 end
