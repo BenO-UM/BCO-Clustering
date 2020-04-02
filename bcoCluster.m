@@ -35,7 +35,7 @@ numExamplesToReassign = round(0.05*numExamples);
 
 % Each "bee" is represented by a column in a matrix of cluster numbers
 scoutingBees = randomIntInRange(1,k,numExamples,Ns);
-scoutingBeeScores = evaluateBees(X,scoutingBees);
+scoutingBeeScores = evaluateBees(scoutingBees,X,k);
 
 %% Main loop
 for iterIdx = 1:numIterations
@@ -61,7 +61,7 @@ for iterIdx = 1:numIterations
     remainingBeeIdxs = otherIdxs(~ismember(otherIdxs,nonEliteBeeIdxs));
     scoutingBees(:,remainingBeeIdxs) = randomIntInRange(1,k,numExamples,length(remainingBeeIdxs));
     % Update scores
-    scoutingBeeScores = evaluateBees(X,scoutingBees);
+    scoutingBeeScores = evaluateBees(scoutingBees,X,k);
 end
 
 end
