@@ -2,8 +2,8 @@ function clusterNumbers = bcoCluster(X,k)
 % Perform clustering using Bee Colony Optimization (BCO) algorithm
 
 % Inputs:
-%   X is an n-by-p matrix, where n is the number of examples and
-%       p is the number of attributes
+%   X is an n-by-p matrix, where n is the number of examples and p is the
+%       number of attributes
 %   k is a scalar indicating the number of clusters
 
 [numExamples, numAttributes] = size(X);
@@ -47,21 +47,29 @@ for iterIdx = 1:numIterations
     nonEliteBeeIdxs = otherIdxs(randperm(length(otherIdxs),Nb-Ne));
     % Update elite bee cluster numbers
     for eliteBeeIdx = eliteBeeIdxs
-        scoutingBees(eliteBeeIdx) = updateClusterNumbers(...
+        [updatedClusterNumbers, updatedScore] = updateClusterNumbers(...
             scoutingBees(:,eliteBeeIdx),scoutingBeeScores(eliteBeeIdx),...
             Nre,numExamplesToReassign,X,k);
+        scoutingBees(eliteBeeIdx) = updatedClusterNumbers;
+        scoutingBeeScores(eliteBeeIdx) = updatedScore;
     end
     % Update other bee cluster numbers
     for nonEliteBeeIdx = nonEliteBeeIdxs
-        scoutingBees(eliteBeeIdx) = updateClusterNumbers(...
+        [updatedClusterNumbers, updatedScore] = updateClusterNumbers(...
             scoutingBees(:,nonEliteBeeIdx),scoutingBeeScores(nonEliteBeeIdx),...
             Nrn,numExamplesToReassign,X,k);
+        scoutingBees(nonEliteBeeIdx) = updatedClusterNumbers;
+        scoutingBeeScores(nonEliteBeeIdx) = updatedScore;
     end
     % Set remaining bees randomly
     remainingBeeIdxs = otherIdxs(~ismember(otherIdxs,nonEliteBeeIdxs));
     scoutingBees(:,remainingBeeIdxs) = randomIntInRange(1,k,numExamples,length(remainingBeeIdxs));
-    % Update scores
-    scoutingBeeScores = evaluateBees(scoutingBees,X,k);
+    % Update scores of remaining bees
+    scoutingBeeScores(remainingBeeIdxs) = evaluateBees(scoutingBees(:,remainingBeeIdxs),X,k);
 end
+
+% return cluster numbers corresponding to best-scoring bee
+[~,bestIdx] = min(scoutingBeeScores);
+clusterNumbers = scoutingBees(:,bestIdx);
 
 end
