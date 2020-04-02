@@ -50,7 +50,7 @@ for iterIdx = 1:numIterations
         [updatedClusterNumbers, updatedScore] = updateClusterNumbers(...
             scoutingBees(:,eliteBeeIdx),scoutingBeeScores(eliteBeeIdx),...
             Nre,numExamplesToReassign,X,k);
-        scoutingBees(eliteBeeIdx) = updatedClusterNumbers;
+        scoutingBees(:,eliteBeeIdx) = updatedClusterNumbers;
         scoutingBeeScores(eliteBeeIdx) = updatedScore;
     end
     % Update other bee cluster numbers
@@ -58,7 +58,7 @@ for iterIdx = 1:numIterations
         [updatedClusterNumbers, updatedScore] = updateClusterNumbers(...
             scoutingBees(:,nonEliteBeeIdx),scoutingBeeScores(nonEliteBeeIdx),...
             Nrn,numExamplesToReassign,X,k);
-        scoutingBees(nonEliteBeeIdx) = updatedClusterNumbers;
+        scoutingBees(:,nonEliteBeeIdx) = updatedClusterNumbers;
         scoutingBeeScores(nonEliteBeeIdx) = updatedScore;
     end
     % Set remaining bees randomly

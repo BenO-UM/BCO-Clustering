@@ -2,7 +2,6 @@ function [newClusterNumbers, newScore] = updateClusterNumbers(bee,score,Nr,numEx
 
 % Generate Nr recruited bees by randomly reassigning cluster numbers from
 % current bee
-
 recruitedBees = repmat(bee,1,Nr);
 numExamples = size(X,1);
 for recruitedBeeIdx = 1:Nr
