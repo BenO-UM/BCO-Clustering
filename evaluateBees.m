@@ -8,6 +8,9 @@ for beeIdx = 1:numBees
     currentBee = bees(:,beeIdx);
     for clusterIdx = 1:k
         examplesInCluster = X(currentBee==clusterIdx,:);
+        if isempty(examplesInCluster)
+            continue;
+        end
         clusterCentroid = mean(examplesInCluster,1);
         scores(beeIdx) = scores(beeIdx) + sum((examplesInCluster-clusterCentroid).^2,'all');
     end

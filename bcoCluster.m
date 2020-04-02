@@ -23,19 +23,34 @@ Ne = 2;
 Nre = 4;
 
 % Number of recruited bees following non-elite bees
-Nrb = 2;
+Nrn = 2;
 
 % Number of iterations (we can use this or some other stopping criterion
 numIterations = 100;
 
-% Number of examples to reassign for "neighborhood" search
- numExamplesToReassign = round(0.05*numExamples);
+% Number of examples to reassign for local search
+numExamplesToReassign = round(0.05*numExamples);
 
 %% Initialization
 
 % Each "bee" is represented by a column in a matrix of cluster numbers
-scoutingBees = floor(rand(numExamples,Ns)*k)+1;
+scoutingBees = randomIntInRange(1,k,numExamples,Ns);
 scoutingBeeScores = evaluateBees(X,scoutingBees);
 
+%% Main loop
+for iterIdx = 1:numIterations
+    % Select elite bees
+    [~,sortedIdxs] = sort(scoutingBeeScores);
+    eliteBeeIdxs = sortedIdxs(1:Ne);
+    % Select other bees for local search
+    otherIdxs = sortedIdxs(Ne+1:end);
+    otherSearchIdxs = otherIdxs(randomIntInRange(1,length(otherIdxs),Nb-Ne,1));
+    % Update elite bee cluster numbers
+    for eliteBeeIdx = eliteBeeIdxs
+        scoutingBees(eliteBeeIdx) = updateClusterNumbers(...
+            scoutingBees(:,eliteBeeIdx),Nre,numExamplesToReassign,X,k);
+    end
+    
+end
 
 end
