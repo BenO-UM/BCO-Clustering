@@ -6,27 +6,27 @@ function clusterNumbers = bcoCluster(X,k)
 %       number of attributes
 %   k is a scalar indicating the number of clusters
 
-[numExamples, numAttributes] = size(X);
+numExamples = size(X,1);
 
 %% Algorithm parameters
 
 % Number of scouting bees
-Ns = 10;
+Ns = 200;
 
 % Number of best sites
-Nb = 5;
+Nb = 20;
 
 % Number of elite bees
-Ne = 2;
+Ne = 10;
 
 % Number of recruited bees following elite bees
-Nre = 4;
+Nre = 30;
 
 % Number of recruited bees following non-elite bees
-Nrn = 2;
+Nrn = 15;
 
 % Number of iterations (we can use this or some other stopping criterion)
-numIterations = 100;
+numIterations = 500;
 
 % Number of examples to reassign for local search
 numExamplesToReassign = round(0.05*numExamples);
@@ -71,5 +71,8 @@ end
 % return cluster numbers corresponding to best-scoring bee
 [~,bestIdx] = min(scoutingBeeScores);
 clusterNumbers = scoutingBees(:,bestIdx);
+
+% Idea for improvement - calculate cluster centroids from clusterNumbers 
+% above, and assign each point to nearest cluster centroid
 
 end
