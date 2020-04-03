@@ -13,36 +13,41 @@ if nargin < 3
     printFlag = false;
 end
 
-[numExamples, numAttributes] = size(X);
+numAttributes = size(X,2);
+
+% normalize attributes to [0,1] range
+X = (X-min(X,[],1))./(max(X,[],1)-min(X,[],1));
 
 %% Algorithm parameters
 
 % Number of scouting bees
-Ns = 200;
+Ns = 100;
 
 % Number of best sites
-Nb = 20;
+Nb = 10;
 
 % Number of elite bees
-Ne = 10;
+Ne = 5;
 
 % Number of recruited bees following elite bees
-Nre = 30;
+Nre = 10;
 
 % Number of recruited bees following non-elite bees
-Nrn = 15;
+Nrn = 5;
 
 % Number of iterations (we can use this or some other stopping criterion)
-numIterations = 500;
+numIterations = 20;
 
-% Number of examples to reassign for local search
-numExamplesToReassign = round(0.05*numExamples);
+% Range within which neighborhood search will be done
+range = 0.2;
 
 %% Initialization
 
-% Each "bee" is represented by a column in a matrix of cluster numbers
-scoutingBees = randomIntInRange(1,k,numExamples,Ns);
-scoutingBeeScores = evaluateBees(scoutingBees,X,k);
+% Each "bee" is represented by a "layer" of a 3-D matrix
+% Each bee/layer is k-by-numAttributes and gives the cluster centroids
+
+scoutingBees = rand(k,numAttributes,Ns);
+scoutingBeeScores = evaluateBees(scoutingBees,X);
 
 %% Main loop
 for iterIdx = 1:numIterations
@@ -54,25 +59,25 @@ for iterIdx = 1:numIterations
     nonEliteBeeIdxs = otherIdxs(randperm(length(otherIdxs),Nb-Ne));
     % Update elite bee cluster numbers
     for eliteBeeIdx = eliteBeeIdxs
-        [updatedClusterNumbers, updatedScore] = updateClusterNumbers(...
-            scoutingBees(:,eliteBeeIdx),scoutingBeeScores(eliteBeeIdx),...
-            Nre,numExamplesToReassign,X,k);
-        scoutingBees(:,eliteBeeIdx) = updatedClusterNumbers;
-        scoutingBeeScores(eliteBeeIdx) = updatedScore;
+        [bestBee, bestScore] = doNeighborhoodSearch(...
+            scoutingBees(:,:,eliteBeeIdx),scoutingBeeScores(eliteBeeIdx),...
+            Nre,range,X);
+        scoutingBees(:,:,eliteBeeIdx) = bestBee;
+        scoutingBeeScores(eliteBeeIdx) = bestScore;
     end
     % Update other bee cluster numbers
     for nonEliteBeeIdx = nonEliteBeeIdxs
-        [updatedClusterNumbers, updatedScore] = updateClusterNumbers(...
-            scoutingBees(:,nonEliteBeeIdx),scoutingBeeScores(nonEliteBeeIdx),...
-            Nrn,numExamplesToReassign,X,k);
-        scoutingBees(:,nonEliteBeeIdx) = updatedClusterNumbers;
-        scoutingBeeScores(nonEliteBeeIdx) = updatedScore;
+        [bestBee, bestScore] = doNeighborhoodSearch(...
+            scoutingBees(:,:,nonEliteBeeIdx),scoutingBeeScores(nonEliteBeeIdx),...
+            Nrn,range,X);
+        scoutingBees(:,:,nonEliteBeeIdx) = bestBee;
+        scoutingBeeScores(nonEliteBeeIdx) = bestScore;
     end
     % Set remaining bees randomly
     remainingBeeIdxs = otherIdxs(~ismember(otherIdxs,nonEliteBeeIdxs));
-    scoutingBees(:,remainingBeeIdxs) = randomIntInRange(1,k,numExamples,length(remainingBeeIdxs));
+    scoutingBees(:,:,remainingBeeIdxs) = rand(k,numAttributes,length(remainingBeeIdxs));
     % Update scores of remaining bees
-    scoutingBeeScores(remainingBeeIdxs) = evaluateBees(scoutingBees(:,remainingBeeIdxs),X,k);
+    scoutingBeeScores(remainingBeeIdxs) = evaluateBees(scoutingBees(:,:,remainingBeeIdxs),X);
     
     if printFlag
         fprintf('Iteration %d\n', iterIdx);
@@ -81,15 +86,7 @@ end
 
 % return cluster numbers corresponding to best-scoring bee
 [~,bestIdx] = min(scoutingBeeScores);
-clusterNumbers = scoutingBees(:,bestIdx);
-
-% Idea for improvement - calculate cluster centroids from clusterNumbers 
-% above, and assign each point to nearest cluster centroid
-clusterCentroids = zeros(k,numAttributes);
-for clusterIdx = 1:k
-    clusterCentroids(clusterIdx,:) = mean(X(clusterNumbers==clusterIdx,:),1);
-end
-clusterNumbers = knnsearch(clusterCentroids,X);
+clusterNumbers = knnsearch(scoutingBees(:,:,bestIdx),X);
 
 
 end
