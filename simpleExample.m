@@ -1,7 +1,7 @@
 % Simple 2D example
 % Creates 2 clusters of data
 
-numExamples = 100;
+numExamples = 500;
 X = zeros(numExamples,2);
 
 for i = 1:numExamples/2

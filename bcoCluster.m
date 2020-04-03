@@ -1,12 +1,19 @@
-function clusterNumbers = bcoCluster(X,k)
+function clusterNumbers = bcoCluster(X,k,printFlag)
 % Perform clustering using Bee Colony Optimization (BCO) algorithm
 
 % Inputs:
 %   X is an n-by-p matrix, where n is the number of examples and p is the
 %       number of attributes
 %   k is a scalar indicating the number of clusters
+%   printFlag is a boolean indicating whether iteration numbers should be
+%       printed to command window during execution of algorithm (best with
+%       large data sets where clustering may take a long time)
 
-numExamples = size(X,1);
+if nargin < 3
+    printFlag = false;
+end
+
+[numExamples, numAttributes] = size(X);
 
 %% Algorithm parameters
 
@@ -66,6 +73,10 @@ for iterIdx = 1:numIterations
     scoutingBees(:,remainingBeeIdxs) = randomIntInRange(1,k,numExamples,length(remainingBeeIdxs));
     % Update scores of remaining bees
     scoutingBeeScores(remainingBeeIdxs) = evaluateBees(scoutingBees(:,remainingBeeIdxs),X,k);
+    
+    if printFlag
+        fprintf('Iteration %d\n', iterIdx);
+    end
 end
 
 % return cluster numbers corresponding to best-scoring bee
@@ -74,5 +85,11 @@ clusterNumbers = scoutingBees(:,bestIdx);
 
 % Idea for improvement - calculate cluster centroids from clusterNumbers 
 % above, and assign each point to nearest cluster centroid
+clusterCentroids = zeros(k,numAttributes);
+for clusterIdx = 1:k
+    clusterCentroids(clusterIdx,:) = mean(X(clusterNumbers==clusterIdx,:),1);
+end
+clusterNumbers = knnsearch(clusterCentroids,X);
+
 
 end
