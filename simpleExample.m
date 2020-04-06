@@ -9,6 +9,6 @@ for i = 1:numExamples/2
     X(i+numExamples/2,:) = rand(1,2)-1;
 end
 
-clusterNumbers = bcoCluster(X,2,true);
+clusterNumbers = bcoCluster(X,2,'silhouette',true);
 
 plotTwoClusters(X,clusterNumbers);
