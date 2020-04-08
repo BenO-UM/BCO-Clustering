@@ -1,4 +1,4 @@
-function clusterNumbers = bcoCluster(X,k,evalType,printFlag)
+function [clusterNumbers, normalizedClusterCentroids] = bcoCluster(X,k,evalType,printFlag)
 % Perform clustering using Bee Colony Optimization (BCO) algorithm
 
 % Inputs:
@@ -53,7 +53,7 @@ Nrn = 10;
 numIterations = 50;
 
 % Range within which neighborhood search will be done
-range = 0.2;
+range = 0.1;
 
 %% Initialization
 
@@ -101,5 +101,6 @@ end
 % return cluster numbers corresponding to best-scoring bee
 [~,bestIdx] = min(scoutingBeeScores);
 clusterNumbers = knnsearch(scoutingBees(:,:,bestIdx),X);
+normalizedClusterCentroids = scoutingBees(:,:,bestIdx);
 
 end
