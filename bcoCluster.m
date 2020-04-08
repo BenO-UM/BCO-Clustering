@@ -30,7 +30,7 @@ end
 numAttributes = size(X,2);
 
 % normalize attributes to [0,1] range
-% X = (X-min(X,[],1))./(max(X,[],1)-min(X,[],1));
+X = (X-min(X,[],1))./(max(X,[],1)-min(X,[],1));
 
 %% Algorithm parameters
 
