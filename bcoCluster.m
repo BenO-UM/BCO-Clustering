@@ -35,19 +35,19 @@ X = (X-min(X,[],1))./(max(X,[],1)-min(X,[],1));
 %% Algorithm parameters
 
 % Number of scouting bees
-Ns = 50;
+Ns = 1000;
 
 % Number of best sites
-Nb = 10;
+Nb = 100;
 
 % Number of elite bees
-Ne = 5;
+Ne = 50;
 
 % Number of recruited bees following elite bees
-Nre = 10;
+Nre = 20;
 
 % Number of recruited bees following non-elite bees
-Nrn = 5;
+Nrn = 10;
 
 % Number of iterations (we can use this or some other stopping criterion)
 numIterations = 50;
