@@ -35,13 +35,13 @@ X = (X-min(X,[],1))./(max(X,[],1)-min(X,[],1));
 %% Algorithm parameters
 
 % Number of scouting bees
-Ns = 1000;
+Ns = 200;
 
 % Number of best sites
-Nb = 100;
+Nb = 40;
 
 % Number of elite bees
-Ne = 50;
+Ne = 20;
 
 % Number of recruited bees following elite bees
 Nre = 20;
@@ -50,10 +50,10 @@ Nre = 20;
 Nrn = 10;
 
 % Number of iterations (we can use this or some other stopping criterion)
-numIterations = 50;
+numIterations = 100;
 
 % Range within which neighborhood search will be done
-range = 0.1;
+range = 0.03;
 
 %% Initialization
 
